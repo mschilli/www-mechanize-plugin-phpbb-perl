@@ -4,25 +4,26 @@
 # Mike Schilli, 2005 (m@perlmeister.com)
 ###########################################
 use strict;
-use Sysadm::Install qw(:all);
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($DEBUG);
 
 use WWW::Mechanize::Pluggable;
-    my $mech = new WWW::Mechanize::Pluggable;
+my $mech = new WWW::Mechanize::Pluggable;
 
-        $mech->get("http://usarundbrief.com/forum");
-#$mech->phpbb_login("username", "password");
+$mech->get("http://usarundbrief.com/forum");
 
-                    # Get a list of forums
-                my $forums = $mech->phpbb_forums();
-                    for my $forum (@$forums) {
-                                print "Forum:", $forum->text(), "\n";
-                                    }
+    # Get a list of forums
+my $forums = $mech->phpbb_forums();
+for my $forum (@$forums) {
+    print "Forum:", $forum->text(), "\n";
+}
 
-        # Enter a forum matched by a regex
-    $mech->phpbb_forum_enter(qr(.));
+    # Enter a forum matched by a regex
+$mech->phpbb_forum_enter(qr(.));
 
-            # Return a list of topics
-        my $topics = $mech->phpbb_topics();
-            for my $topic (@$topics) {
-                        print "headline=$topic->{text} url=$topic->{url}\n";
-                            }
+        # Return a list of topics
+my $topics = $mech->phpbb_topics();
+for my $topic (@$topics) {
+    print "headline=$topic->{text} url=$topic->{url} ",
+          "count=$topic->{count}\n";
+}

@@ -2,5 +2,5 @@ Changes
 Makefile.PL
 MANIFEST
 README
-t/WWW-Mechanize-Plugin-phpBB.t
+t/001Basic.t
 lib/WWW/Mechanize/Plugin/phpBB.pm
