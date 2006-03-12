@@ -1,0 +1,96 @@
+######################################################################
+    WWW::Mechanize::Plugin::phpBB 0.01
+######################################################################
+
+NAME
+    WWW::Mechanize::Plugin::phpBB - Screen scraper for phpBB installations
+
+SYNOPSIS
+        use WWW::Mechanize::Pluggable;
+        use Log::Log4perl qw(:easy);
+        Log::Log4perl->easy_init($DEBUG);
+
+        my $mech = new WWW::Mechanize::Pluggable;
+
+        $mech->get("http://some.forum.site.com/forum");
+        $mech->phpbb_login("username", "password");
+
+            # Get a list of forums
+        my $forums = $mech->phpbb_forums();
+        for my $forum (@$forums) {
+            print "Forum:", $forum->text(), "\n";
+        }
+
+            # Enter a forum matched by a regex
+        $mech->phpbb_forum_enter(qr(^The Forum Name$));
+
+            # Return a list of topics
+        my $topics = $mech->phpbb_topics();
+        for my $topic (@$topics) {
+            print "headline=$topic->{text} url=$topic->{url}\n";
+        }
+
+DESCRIPTION
+    This is a screen scraper for phpBB installations. It can log in to a
+    phpBB web interface, and pull forum and topics names.
+
+    It is implemented as a plugin to WWW::Mechanize, using Joe McMahon's
+    WWW::Mechanize::Pluggable framework.
+
+    $mech->phpbb_login($user, $passwd)
+        Log into the phpBB web interface using the given credentials. It
+        requires that the $mech object currently points to a phpBB page
+        showing a "Login" link.
+
+        Returns "undef" if the login fails and fires a Log4perl message at
+        level ERROR.
+
+    my $forums = $mech->phpbb_forums()
+        If the $mech object points to a forum site's overview page listing
+        the forums, phpbb_forums will return a ref to an array of forums.
+        Every element of the array is a WWW::Mechanize::Link object and
+        therefore has the methods "text()" and "url" to show forum name and
+        the forum url:
+
+                # Get a list of forums
+            my $forums = $mech->phpbb_forums();
+            for my $forum (@$forums) {
+                print "Forum:", $forum->text(), " ", $forum->url(), "\n";
+            }
+
+    $mech->phpbb_forum_enter($regex)
+        If the $mech object points to a forum site's overview page listing
+        the forums, "phpbb_forum_enter" will have the WWW::Mechanize object
+        enter the first forum matching the specified regex:
+
+                # Enter a forum matched by a regex
+            $mech->phpbb_forum_enter(qr(^The Forum Name$));
+
+        Returns 1 on success and undef on failure.
+
+    my $topics = $mech->phpbb_topics()
+        If the $mech object points to a forum page listing the topics,
+        "phpbb_topics" will scrape the topics off that page (which might
+        only be a fraction of the topics available for the given forum):
+
+                # Return a list of topics
+            my $topics = $mech->phpbb_topics();
+            for my $topic (@$topics) {
+                print "headline=$topic->{text} url=$topic->{url}\n";
+            }
+
+        Every element of the array ref returned is a hashref, containing
+        values for the keys "text" (topic headline), "url" (url to the first
+        page showing this topic), "count" (number of postings for this
+        topic).
+
+AUTHOR
+    Mike Schilli, m@perlmeister.com
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Mike Schilli, m@perlmeister.com
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.5 or, at
+    your option, any later version of Perl 5 you may have available.
+

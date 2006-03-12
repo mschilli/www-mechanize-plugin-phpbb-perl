@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/WWW-Mechanize-Plugin-phpBB.t
+lib/WWW/Mechanize/Plugin/phpBB.pm
