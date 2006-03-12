@@ -24,6 +24,7 @@ sub init {
     *{caller() . '::phpbb_forums'} = \&forums;
     *{caller() . '::phpbb_forum_enter'} = \&forum_enter;
     *{caller() . '::phpbb_topics'} = \&topics;
+    *{caller() . '::phpbb_post_remove'} = \&post_remove;
 }
 
 ###########################################
@@ -159,6 +160,27 @@ sub topics {
           ".";
 
     return $topics_all;
+}
+
+###########################################
+sub post_remove {
+###########################################
+    my ($mech, $post_id) = @_;
+
+    DEBUG "Removing post $post_id";
+
+        # Find delete link
+    my $link = $mech->find_link(url_regex => qr/\Qmode=delete&p=$post_id\E/);
+
+    LOGDIE "Cannot find delete link for posting $post_id" unless defined $link;
+    DEBUG "Going to ", $link->url();
+    $mech->follow_link(url => $link->url());
+
+        # Confirm
+    DEBUG "Confirming delete";
+    $mech->submit_form(
+        button => "confirm",
+    );
 }
 
 1;
