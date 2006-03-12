@@ -1,6 +1,10 @@
 Changes
+eg/rmpost
+eg/slickdeals
+eg/topictest
+lib/WWW/Mechanize/Plugin/phpBB.pm
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 README
 t/001Basic.t
-lib/WWW/Mechanize/Plugin/phpBB.pm
