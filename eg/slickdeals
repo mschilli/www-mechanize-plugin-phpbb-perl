@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ###########################################
-# Grab forums form slickdeals.net
+# Grab forums from slickdeals.net
 ###########################################
 use strict;
 use warnings;

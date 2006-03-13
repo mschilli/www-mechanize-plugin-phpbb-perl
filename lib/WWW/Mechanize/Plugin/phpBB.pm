@@ -14,17 +14,24 @@ __PACKAGE__->mk_accessors(qw(url version));
 __PACKAGE__->version($VERSION);
 
 ###########################################
+sub import {
+###########################################
+    # We need an empty import method, otherwise
+    # the Module::Pluggable test suite breaks:
+    #    # t/plugin.t
+    #    use WWW::Mechanize::Pluggable helloworld=>"WORLD";
+}
+
+###########################################
 sub init {
 ###########################################
     my($class, @args) = @_;
 
     no strict 'refs';
 
-    *{caller() . '::phpbb_login'} = \&login;
-    *{caller() . '::phpbb_forums'} = \&forums;
-    *{caller() . '::phpbb_forum_enter'} = \&forum_enter;
-    *{caller() . '::phpbb_topics'} = \&topics;
-    *{caller() . '::phpbb_post_remove'} = \&post_remove;
+    for my $method (qw(login forums forum_enter topics post_remove)) {
+        *{caller() . "::phpbb_$method"} = \&$method;
+    }
 }
 
 ###########################################
@@ -219,11 +226,14 @@ WWW::Mechanize::Plugin::phpBB - Screen scraper for phpBB installations
 
 =head1 DESCRIPTION
 
-This is a screen scraper for phpBB installations. It can log in to
-a phpBB web interface, and pull forum and topics names.
+C<WWW::Mechanize::Plugin::phpBB> is a screen scraper for phpBB driven
+forum sites. It can log into the phpBB web interface, pull forum and
+topics names and perform administrative tasks like deleting posts.
 
-It is implemented as a plugin to WWW::Mechanize, using Joe McMahon's 
-WWW::Mechanize::Pluggable framework.
+FUNCTIONALITY IS CURRENTLY LIMITED, READ ON WHAT'S AVAILABLE SO FAR.
+
+C<WWW::Mechanize::Plugin::phpBB> is implemented as a plugin to
+WWW::Mechanize, using Joe McMahon's WWW::Mechanize::Pluggable framework.
 
 =over 4
 
@@ -232,6 +242,10 @@ WWW::Mechanize::Pluggable framework.
 Log into the phpBB web interface using the given credentials. It requires
 that the C<$mech> object currently points to a phpBB page showing a "Login"
 link.
+
+Note that most forums don't require you to log in in order to read the
+messages, so this is only necessary if you want to perform administrative
+tasks (like phpbb_post_remove()) or read a private forum.
 
 Returns C<undef> if the login fails and fires a
 Log4perl message at level ERROR.
@@ -247,7 +261,8 @@ and the forum url:
         # Get a list of forums
     my $forums = $mech->phpbb_forums();
     for my $forum (@$forums) {
-        print "Forum:", $forum->text(), " ", $forum->url(), "\n";
+        print "Forum:", $forum->text(), " ", 
+              $forum->url(), "\n";
     }
 
 =item $mech-E<gt>phpbb_forum_enter($regex)
@@ -276,6 +291,15 @@ only be a fraction of the topics available for the given forum):
 Every element of the array ref returned is a hashref, containing
 values for the keys C<text> (topic headline), C<url> (url to the
 first page showing this topic), C<count> (number of postings for this topic).
+
+=item $mech-E<gt>phpbb_post_remove($post_id)
+
+Note that you need to perform a successful login() before using this method.
+phpbb_post_remove takes a post ID (like the '6' in 
+C<forum/posting.php?mode=quote&p=6>), pulls up the
+page showing the post, clicks the 'X' button and then clicks 'Yes'
+in the confirmation dialog to delete the posting. 
+Handy for automatically deleting spammer postings.
 
 =back
 

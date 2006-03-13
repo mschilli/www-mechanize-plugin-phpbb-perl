@@ -1,16 +1,24 @@
 #!/usr/bin/perl -w
 ###########################################
-# xx -- 
-# Mike Schilli, 2005 (m@perlmeister.com)
+# topictest
+# Mike Schilli, 2006 (m@perlmeister.com)
 ###########################################
 use strict;
 use Log::Log4perl qw(:easy);
 Log::Log4perl->easy_init($DEBUG);
+use YAML qw(Dump);
 
 use WWW::Mechanize::Pluggable;
+
 my $mech = new WWW::Mechanize::Pluggable;
 
-$mech->get("http://usarundbrief.com/forum");
+my($url) = @ARGV;
+
+if(! defined $url) {
+    die "usage: $0 forum_url";
+}
+
+$mech->get(shift);
 
     # Get a list of forums
 my $forums = $mech->phpbb_forums();
@@ -18,12 +26,9 @@ for my $forum (@$forums) {
     print "Forum:", $forum->text(), "\n";
 }
 
-    # Enter a forum matched by a regex
+    # Enter first forum
 $mech->phpbb_forum_enter(qr(.));
 
         # Return a list of topics
 my $topics = $mech->phpbb_topics();
-for my $topic (@$topics) {
-    print "headline=$topic->{text} url=$topic->{url} ",
-          "count=$topic->{count}\n";
-}
+print Dump($topics);
