@@ -4,14 +4,13 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Log::Log4perl qw(:easy);
 use HTML::TreeBuilder;
 
 use base qw(Class::Accessor::Fast);
 __PACKAGE__->mk_accessors(qw(url version));
-__PACKAGE__->version($VERSION);
 
 ###########################################
 sub import {

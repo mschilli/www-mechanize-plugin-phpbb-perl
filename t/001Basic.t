@@ -4,6 +4,4 @@
 
 use Test::More tests => 1;
 
-BEGIN { use_ok('WWW::Mechanize::Pluggable') };
-
-my $mech = WWW::Mechanize::Pluggable->new();
+use_ok "WWW::Mechanize::Plugin::phpBB";
